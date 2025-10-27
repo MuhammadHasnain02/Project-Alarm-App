@@ -21,12 +21,11 @@ setInterval(() => {
 let alarmTime = document.getElementById("alarmTime")
 let setAlarmBtn = document.getElementById("setAlarmBtn")
 let delAlarmBtn = document.getElementById("delAlarmBtn")
-let alarmSound = document.getElementById("alarmSound")
+// let alarmSound = document.getElementById("alarmSound")
 let alarmList = document.getElementById("alarmList")
 
-
-
-let alarms = []
+let alarms = JSON.parse(localStorage.getItem("alarms")) || [];
+renderAlarms();
 
 // ------------ Set Alarm Button --------------
 
@@ -61,6 +60,9 @@ setAlarmBtn.addEventListener("click" , () => {
     });
     console.log(alarms);
 
+    // Save to localStorage
+    saveAlarms()
+
     // Render alarm list
     renderAlarms()
 
@@ -72,6 +74,22 @@ setAlarmBtn.addEventListener("click" , () => {
 function renderAlarms() {
     alarmList.innerHTML = ""
 
+    if (alarms.length === 0) {
+
+        let li = document.createElement("li")
+        li.className = "flex justify-between items-center bg-white/10 border border-white/20 px-4 py-2 w-full rounded-lg";
+        
+        li.innerHTML = 
+        `
+        <i class="fa-solid fa-plus text-white"></i>
+        <span class="text-lg font-bold text-gray-300">No Alarm</span>
+        <i class="fa-regular fa-alarm-clock text-white"></i>
+        `
+        alarmList.appendChild(li)
+
+
+    }
+
     alarms.forEach((alarm , i) => {
         
         let li = document.createElement("li")
@@ -79,14 +97,14 @@ function renderAlarms() {
         
         li.innerHTML = 
         `
-        <i class="fa-regular fa-alarm-clock text-white"></i>
+        <i class="fa-regular fa-alarm-clock text-[20px] text-white hover:cursor-pointer duration-400 hover:scale-95"></i>
         <span class="text-lg font-bold text-gray-300">${alarm.time}</span>
         <div class="flex flex-row items-center space-x-2">
 
             <button onclick="toggleAlarm(${i})"" class="changeIcon text-[25px] text-gray-300 hover:cursor-pointer font-bold">
                 <i class="fa-solid ${alarm.active ? 'fa-toggle-on' : 'fa-toggle-off'}"></i>
             </button>
-            <button onclick="deleteAlarm(${i})" class="text-[19px] text-gray-300 hover:text-gray-400 hover:cursor-pointer font-bold">
+            <button onclick="deleteAlarm(${i})" class="text-[19px] text-gray-300 duration-500 hover:scale-95 hover:cursor-pointer font-bold">
                 <i class="fa-solid fa-trash"></i>
             </button>
 
@@ -103,6 +121,8 @@ function renderAlarms() {
 function toggleAlarm(index) {
     alarms[index].active = !alarms[index].active
     alarms[index].triggered = false
+
+    saveAlarms();
     renderAlarms();
 }
 
@@ -110,11 +130,21 @@ function toggleAlarm(index) {
 
 function deleteAlarm(index) {
     alarms.splice(index, 1);
-    console.log(alarms);
+    
+    saveAlarms();
     renderAlarms();
 }
 
+// Utility Function → Save all alarms in localStorage
+function saveAlarms() {
+    localStorage.setItem("alarms", JSON.stringify(alarms));
+}
+
 // --------------<<< Alarm Trigger >>>------------------
+
+let alarmSound = new Audio(
+  "https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"
+);
 
 setInterval(() => {
 
@@ -128,9 +158,11 @@ setInterval(() => {
 
     alarms.forEach(alarm => {
         
-        if (alarm.active && !alarm.triggered && alarm.time === current) {
+        if (alarm.active && alarm.time === current) {
             
-            alarm.triggered = true
+            alarm.triggered = false
+            saveAlarms()
+            renderAlarms()
 
             // --- Play alarm sound ---
             alarmSound.currentTime = 0
@@ -139,12 +171,13 @@ setInterval(() => {
             // --- Alert messages ---
             alert(`⏰ Alarm for ${current} is ringing!`);
     
-            // --- Auto stop after 12s ---
+            // --- Auto stop after 10s ---
             setTimeout(() => {
                 
                 alarmSound.pause()
                 alarmSound.currentTime = 0
                 alarm.active = false
+                alarm.triggered = false
                 renderAlarms();
 
             }, 10000);
