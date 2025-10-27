@@ -57,6 +57,8 @@
 
 <body class="bg-linear-to-tl from-[#00175B] to-[#FDA693] min-h-screen">
 
+    <audio id="alarmSound" src="preview.mp3" preload="auto"></audio>
+
     <section class="flex flex-col items-center h-screen justify-center">
         <div class="flex flex-col gap-8 space-x-10 px-14 py-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-md">
             
@@ -78,7 +80,7 @@
 
                     <div class="text-gray-200">
                         <input type="time" id="alarmTime"
-                        class="px-3 py-2 w-50 text-[17px] font-bold border border-white/30 rounded-lg tracking-widest [color-scheme:dark]">
+                        class="px-3 py-2 w-50 text-[17px] font-bold border border-white/30 rounded-lg tracking-widest [color-scheme:dark] hover:cursor-pointer">
                     </div>
 
                     <button id="setAlarmBtn" 
@@ -91,12 +93,20 @@
             </div>
                     
             <!-- Alarm List -->
-            <div class="w-full space-y-3">
+            <div class="w-full space-y-5">
 
                 <h2 class="text-center text-2xl font-bold text-gray-300 drop-shadow-lg">
                     <span class="pl-0">Your Alarms</span>
                 </h2>
-                <ul id="alarmList" class="flex flex-col items-center space-y-2"></ul>
+                <ul id="alarmList" class="text-center space-y-3">
+
+                    <li class="flex justify-between items-center bg-white/10 border border-white/20 px-4 py-2 w-full rounded-lg">
+                        <i class="fa-solid fa-plus text-white"></i>
+                        <span class="text-lg font-bold text-gray-300">No Alarm</span>
+                        <i class="fa-regular fa-alarm-clock text-white"></i>
+                    </li>
+                    
+                </ul>
 
             </div>
 
